@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>記憶撲克牌遊戲</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game-wrapper">
+        <div class="header">
+            <div class="title">記憶撲克牌</div>
+            <div class="controls">
+                <span id="difficulty-label">6x6</span>
+                <button class="btn" id="fullscreen-btn">⛶ 全螢幕</button>
+                <button class="btn" id="restart-btn">重新開始</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <span>配對：<span id="matches">0</span>/<span id="total-pairs">18</span></span>
+        </div>
+
+        <div class="board" id="board">
+            <!-- JS 會動態產生卡片 -->
+        </div>
+        <!-- 產生訊息區塊 -->
+        <div class="message" id="message"></div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

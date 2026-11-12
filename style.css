@@ -1,0 +1,290 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: radial-gradient(circle at top, #fdfbfb, #ebedee);
+}
+
+/* ===== 外框：撐滿整個瀏覽器 ===== */
+.game-wrapper {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: #ffffff;
+    padding: 16px 24px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.title {
+    font-size: clamp(1.1rem, 3vh, 1.8rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: clamp(0.85rem, 2vh, 1.2rem);
+}
+
+.btn {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+    font-size: clamp(0.8rem, 1.8vh, 1.1rem);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: clamp(0.85rem, 2vh, 1.2rem);
+    color: #4b5563;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+/* ===== 棋盤：欄數、卡片寬度、比例、間距都由 main.js 依螢幕自動計算 ===== */
+/* （這裡只是預設值，要調整請改 main.js 最上方的參數） */
+.board {
+    --cols: 6;
+    --card-w: 90px;
+    --card-ratio: 1;
+    --gap: 14px;
+
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--card-w));
+    gap: var(--gap);
+    justify-content: center;
+    /* 左右置中 */
+    align-content: center;
+    /* 上下置中 */
+}
+
+/* ===== 卡片：比例跟著 --card-ratio 走 ===== */
+.card {
+    position: relative;
+    width: var(--card-w);
+    aspect-ratio: var(--card-ratio);
+    cursor: pointer;
+    perspective: 1000px;
+    overflow: visible;
+}
+
+.card-inner {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    overflow: hidden;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #1f2937, #4b5563);
+    color: #f9fafb;
+    border: 2px solid #111827;
+    font-size: calc(var(--card-w) * 0.5);
+}
+
+.card-front {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    transform: rotateY(180deg);
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px;
+}
+
+/* ===== 圖片卡：撲克牌圖片直接撐滿整張卡 ===== */
+.card-front.picture-only {
+    padding: 0;
+    border: none;
+    background: #ffffff;
+}
+
+.card-front.picture-only img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ===== 文字卡 ===== */
+.card-front.word-only {
+    padding: 6px;
+    background: #eff6ff;
+}
+
+.card-front .word {
+    font-weight: bold;
+    color: #111827;
+    text-align: center;
+    line-height: 1.15;
+    max-width: 100%;
+}
+
+.card-front.word-only .word {
+    font-size: calc(var(--card-w) * 0.15);
+    /* 字體跟著卡片寬度縮放 */
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.card.matched {
+    cursor: default;
+    pointer-events: none;
+    opacity: 0.7;
+    filter: grayscale(0.3);
+}
+
+.message {
+    margin-top: 8px;
+    font-size: clamp(0.85rem, 2vh, 1.2rem);
+    text-align: center;
+    color: #0891b2;
+    min-height: 1.4em;
+    flex-shrink: 0;
+}
+
+/* 波紋效果 */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: ripple-animation 0.6s ease-out;
+}
+
+@keyframes ripple-animation {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+/* 點擊縮放彈跳效果 */
+.card.click-bounce {
+    animation: bounce-scale 0.4s ease-out;
+}
+
+@keyframes bounce-scale {
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scale(0.9);
+    }
+
+    60% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 配對成功發光效果 */
+.card.match-glow .card-inner {
+    animation: glow-pulse 0.8s ease-out;
+}
+
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 25px 8px rgba(34, 197, 94, 0.8),
+            0 0 40px 12px rgba(34, 197, 94, 0.4);
+    }
+}
+
+/* 配對成功閃爍效果 */
+.card.match-flash .card-front {
+    animation: flash-bg 0.6s ease-out;
+}
+
+@keyframes flash-bg {
+
+    0%,
+    100% {
+        background: #f9fafb;
+    }
+
+    50% {
+        background: #d1fae5;
+    }
+}
+
+/* 手機等小螢幕 */
+@media (max-width: 600px) {
+    .game-wrapper {
+        padding: 10px 8px;
+    }
+}
